@@ -2,8 +2,13 @@ const socket = new WebSocket("wss://echo.websocket.org");
 
 /** @type {number[]} */
 let pingArr = [];
-let success = 0;
-let fail = 0;
+let success = 0, fail = 0;
+
+
+/** @type {number | null} */
+let min = null;
+/** @type {number | null} */
+let max = null;
 
 const output = (ping) => {
   const div = document.getElementById("result");
@@ -14,6 +19,29 @@ const output = (ping) => {
   div.appendChild(newElem);
 };
 
+const putPing = (n) => {
+  pingArr.push(n);
+  console.log('Called', n)
+  if (min && min > n) {
+    min = n;
+    document.getElementById('ping-min').textContent = n;
+  } else {
+    min = n;
+    document.getElementById('ping-min').textContent = n;
+  }
+  if (max && max < n) {
+    max = n;
+    document.getElementById('ping-max').textContent = n;
+  } else {
+    max = n;
+    document.getElementById('ping-max').textContent = n;
+  }
+
+  document.getElementById('ping-avg').textContent = pingArr.reduce((sum, num) => sum + num, 0) / pingArr.length;
+
+  if (pingArr.length > 10) pingArr.shift();
+}
+
 socket.addEventListener("open", () => {
   setInterval(() => {
     const before = new Date().getTime();
@@ -23,7 +51,7 @@ socket.addEventListener("open", () => {
       socket.onmessage = (ev) => {
         if (ev.data == "0") {
           const now = new Date().getTime();
-          pingArr.push(now - before);
+          putPing(now - before);
           success++;
           output(now - before);
           console.log(`Ping: ${now - before}ms`);
