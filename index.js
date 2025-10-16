@@ -14,7 +14,7 @@ const output = (ping) => {
   div.appendChild(newElem);
 };
 
-socket.addEventListener("open", (ev) => {
+socket.addEventListener("open", () => {
   setInterval(() => {
     const before = new Date().getTime();
     socket.send("0");
@@ -43,7 +43,7 @@ socket.addEventListener("open", (ev) => {
           _(false);
         }, 5000))
     );
-    Promise.race([pongPromise, timeoutPromise]).then((val) => {
+    Promise.race([pongPromise, timeoutPromise]).then(() => {
       clearInterval(timeoutInterval);
       return;
     });
